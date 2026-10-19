@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тест по физике · Жидкости, газы и центр масс</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070d; --panel:#0a0f1e; --card:rgba(10,15,30,.82);
+  --line:#1b2547; --ink:#eaf2ff; --mut:#8fa0d0;
+  --cyan:#00e5ff; --mag:#ff2fd6; --green:#39ff88; --red:#ff3b5c; --amber:#ffb020;
+  --disp:'Unbounded',system-ui,sans-serif; --body:'Rubik',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--body); color:var(--ink); min-height:100vh; min-height:100dvh;
+  background:var(--bg); overflow-x:hidden; padding-bottom:env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color:transparent;
+}
+.bg-grid{
+  position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    linear-gradient(rgba(90,120,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(90,120,255,.05) 1px,transparent 1px),
+    linear-gradient(rgba(90,120,255,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(90,120,255,.09) 1px,transparent 1px);
+  background-size:24px 24px,24px 24px,120px 120px,120px 120px;
+}
+.glow{position:fixed;z-index:-1;pointer-events:none;border-radius:50%}
+.glow-a{width:60vmax;height:60vmax;left:-22vmax;top:-24vmax;background:radial-gradient(circle,rgba(0,229,255,.13),transparent 62%)}
+.glow-b{width:56vmax;height:56vmax;right:-22vmax;bottom:-26vmax;background:radial-gradient(circle,rgba(255,47,214,.10),transparent 62%)}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(3vmax,2vmax)}}
+.glow-a{animation:drift 14s ease-in-out infinite alternate}
+.glow-b{animation:drift 18s ease-in-out infinite alternate-reverse}
+
+.wrap{max-width:760px;margin:0 auto;padding:clamp(16px,4vw,32px) 16px 56px}
+.screen{display:none}
+.screen.on{display:block;animation:scrIn .45s cubic-bezier(.2,.7,.3,1)}
+@keyframes scrIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.kicker{font:600 10.5px var(--mono);letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;margin-bottom:14px;text-shadow:0 0 14px rgba(0,229,255,.5)}
+.ttl{font:800 clamp(30px,7.4vw,54px)/1.08 var(--disp);letter-spacing:.01em;text-shadow:0 0 34px rgba(0,229,255,.28)}
+.ttl .acc{color:var(--cyan);text-shadow:0 0 22px rgba(0,229,255,.65)}
+.ttl2{font:700 clamp(21px,5vw,32px)/1.15 var(--disp);margin-bottom:18px}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.chip{font:600 11.5px var(--mono);letter-spacing:.06em;padding:7px 12px;border-radius:999px;border:1px solid;white-space:nowrap}
+.c1{color:#7deeff;border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.07)}
+.c2{color:#ff9af0;border-color:rgba(255,47,214,.4);background:rgba(255,47,214,.07)}
+.c3{color:#8dffc0;border-color:rgba(57,255,136,.4);background:rgba(57,255,136,.06)}
+.c4{color:#ffd27a;border-color:rgba(255,176,32,.4);background:rgba(255,176,32,.07)}
+.chip.who{color:#7deeff;border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.06);max-width:52vw;overflow:hidden;text-overflow:ellipsis}
+.chip.alt{color:#ff9af0;border-color:rgba(255,47,214,.35);background:rgba(255,47,214,.06)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,4vw,24px);margin-bottom:16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.teacher{display:flex;gap:14px;align-items:center;padding:12px 14px;border:1px solid rgba(0,229,255,.3);border-radius:12px;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(255,47,214,.06));margin-bottom:20px}
+.t-ava{width:46px;height:46px;flex:none;display:grid;place-items:center;border-radius:12px;border:1px solid rgba(0,229,255,.5);font-size:24px;color:var(--cyan);text-shadow:0 0 12px var(--cyan);background:rgba(0,229,255,.08)}
+.t-lbl{font:600 10px var(--mono);letter-spacing:.24em;color:var(--mut);text-transform:uppercase}
+.t-name{font-weight:700;font-size:15px;margin-top:3px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font:600 10.5px var(--mono);letter-spacing:.18em;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+.field label em{color:#5d6c9e;font-style:normal;letter-spacing:.04em;text-transform:none}
+input[type=text],select{
+  width:100%;background:#0b1226;border:1px solid #24305c;border-radius:11px;color:var(--ink);
+  font:500 16px var(--body);padding:13px 14px;outline:none;transition:border-color .25s,box-shadow .25s;
+}
+select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300e5ff' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
+}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(0,229,255,.35)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:420px){.row2{grid-template-columns:1fr}}
+.att-line{min-height:20px;font:600 12px var(--mono);color:var(--amber);margin:2px 0 12px}
+
+.btn{
+  display:block;width:100%;padding:15px;border-radius:12px;border:1px solid #24305c;cursor:pointer;
+  background:#0b1226;color:#5d6c9e;font:700 14px var(--disp);letter-spacing:.16em;
+  transition:all .3s;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+}
+.btn-main:not(:disabled){
+  color:#9ff3ff;border-color:var(--cyan);background:linear-gradient(135deg,rgba(0,229,255,.16),rgba(0,229,255,.04));
+  box-shadow:0 0 20px rgba(0,229,255,.35),inset 0 0 16px rgba(0,229,255,.08);
+}
+.btn-main:not(:disabled):hover{box-shadow:0 0 34px rgba(0,229,255,.6),inset 0 0 20px rgba(0,229,255,.14);transform:translateY(-1px)}
+.btn:disabled{cursor:not-allowed}
+.formula-foot{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font:500 12px var(--mono);color:#4a5a8f;margin-top:6px}
+
+.r-list{list-style:none;counter-reset:r}
+.r-list li{counter-increment:r;position:relative;padding:10px 12px 10px 46px;border-bottom:1px dashed #1c2848;font-size:14px;line-height:1.55;color:#cfd9ff}
+.r-list li:last-child{border-bottom:0}
+.r-list li::before{content:counter(r);position:absolute;left:8px;top:11px;width:26px;height:26px;display:grid;place-items:center;border:1px solid rgba(0,229,255,.5);border-radius:8px;color:var(--cyan);font:700 12px var(--mono);text-shadow:0 0 8px var(--cyan)}
+.r-list b{color:#fff}
+.ac-note{margin:14px 0;padding:12px 14px;border:1px solid rgba(255,176,32,.45);border-radius:12px;background:rgba(255,176,32,.08);color:#ffd9a0;font-size:13px;line-height:1.5}
+.agree{display:flex;gap:11px;align-items:flex-start;padding:12px 2px;font-size:13.5px;color:#cfd9ff;cursor:pointer}
+.agree input{width:20px;height:20px;flex:none;accent-color:#00e5ff;margin-top:1px}
+
+.q-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.q-who{display:flex;flex-direction:column;gap:6px;min-width:0}
+.timer{position:relative;width:58px;height:58px;flex:none}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.t-bg{fill:none;stroke:#1b2547;stroke-width:5}
+.t-fg{fill:none;stroke:var(--cyan);stroke-width:5;stroke-linecap:round;stroke-dasharray:163.4;filter:drop-shadow(0 0 4px rgba(0,229,255,.6));transition:stroke-dashoffset 1s linear,stroke .3s}
+.timer b{position:absolute;inset:0;display:grid;place-items:center;font:700 16px var(--mono);color:#eaf2ff}
+.timer.warn .t-fg{stroke:var(--amber);filter:drop-shadow(0 0 4px rgba(255,176,32,.6))}.timer.warn b{color:var(--amber)}
+.timer.danger .t-fg{stroke:var(--red);animation:blink 1s steps(2) infinite}.timer.danger b{color:var(--red)}
+@keyframes blink{50%{opacity:.35}}
+.q-progress{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.segs{display:flex;gap:4px;flex:1}
+.segs i{flex:1;height:6px;border-radius:3px;background:#161f3d;transition:.35s}
+.segs i.done{box-shadow:0 0 8px currentColor}
+.segs i.st-theory.done{background:var(--cyan);color:var(--cyan)}
+.segs i.st-scheme.done{background:var(--mag);color:var(--mag)}
+.segs i.st-formula.done{background:var(--green);color:var(--green)}
+.segs i.st-calc.done{background:var(--amber);color:var(--amber)}
+.q-count{font:600 12px var(--mono);color:var(--mut);white-space:nowrap}
+.q-count b{color:#fff}
+.q-card.swap{animation:cardIn .4s cubic-bezier(.2,.7,.3,1)}
+@keyframes cardIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.q-card{user-select:none;-webkit-user-select:none}
+.q-badge{display:inline-block;font:700 10px var(--mono);letter-spacing:.2em;padding:6px 11px;border-radius:999px;border:1px solid;margin-bottom:12px}
+.b-cyan{color:#7deeff;border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.08)}
+.b-mag{color:#ff9af0;border-color:rgba(255,47,214,.45);background:rgba(255,47,214,.08)}
+.b-green{color:#8dffc0;border-color:rgba(57,255,136,.45);background:rgba(57,255,136,.07)}
+.b-amber{color:#ffd27a;border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
+.q-text{font:600 clamp(16px,4.2vw,19px)/1.5 var(--body);margin-bottom:14px}
+.svgbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0a0f1e;margin-bottom:16px}
+.svgbox:empty{display:none}
+.svgbox svg{display:block;width:100%;height:auto}
+.lbl{display:block;font:600 10.5px var(--mono);letter-spacing:.16em;color:var(--mut);text-transform:uppercase;margin:14px 0 8px}
+.lbl em{color:#5d6c9e;font-style:normal;text-transform:none;letter-spacing:.03em}
+.num{font-family:var(--mono)!important;font-size:20px!important;letter-spacing:.05em}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+  background:#0b1226;border:1px solid #24305c;border-radius:12px;padding:13px 14px;cursor:pointer;
+  color:#cfd9ff;font:500 15px/1.45 var(--body);transition:all .25s;touch-action:manipulation;
+}
+.opt-key{flex:none;width:28px;height:28px;display:grid;place-items:center;border:1px solid #2c3a6e;border-radius:8px;font:700 13px var(--mono);color:var(--mut);transition:all .25s}
+.opt:hover{border-color:#3b4f9a;transform:translateX(2px)}
+.opt.sel{
+  border-color:var(--cyan);color:#fff;background:linear-gradient(135deg,rgba(0,229,255,.14),rgba(0,229,255,.03));
+  box-shadow:0 0 18px rgba(0,229,255,.4),inset 0 0 14px rgba(0,229,255,.07);
+}
+.opt.sel .opt-key{border-color:var(--cyan);color:var(--cyan);text-shadow:0 0 10px var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.5)}
+.q-foot{position:sticky;bottom:12px;margin-top:16px}
+.btn-next:not(:disabled){
+  color:#9ff3ff;border-color:var(--cyan);background:#08131f;
+  box-shadow:0 0 22px rgba(0,229,255,.5),inset 0 0 18px rgba(0,229,255,.1);
+  animation:pulseNext 1.8s ease-in-out infinite;
+}
+@keyframes pulseNext{50%{box-shadow:0 0 40px rgba(0,229,255,.85),inset 0 0 22px rgba(0,229,255,.16)}}
+
+.ac-modal{position:fixed;inset:0;z-index:99;display:none;place-items:center;background:rgba(3,5,12,.88);backdrop-filter:blur(6px);padding:20px}
+.ac-modal.on{display:grid}
+.ac-box{max-width:420px;width:100%;background:var(--panel);border:1px solid var(--red);border-radius:18px;padding:28px 22px;text-align:center;box-shadow:0 0 60px rgba(255,59,92,.4);animation:scrIn .3s}
+.ac-ico{font-size:52px;animation:blink 1s steps(2) infinite}
+.ac-box h3{font:700 20px var(--disp);color:#ff8ba1;margin:10px 0 12px;text-shadow:0 0 16px rgba(255,59,92,.6)}
+.ac-box p{font-size:14px;line-height:1.55;color:#e6ecff}
+.ac-sub{color:#a9b4dd!important;font-size:12.5px!important;margin-top:10px}
+.btn-warn{margin-top:18px;color:#ffd9a0;border-color:var(--amber);background:rgba(255,176,32,.1);box-shadow:0 0 18px rgba(255,176,32,.35)}
+
+.res-hero{text-align:center;padding:26px 18px}
+.res-score b{font:800 clamp(56px,16vw,86px)/1 var(--disp);color:#fff;text-shadow:0 0 34px rgba(0,229,255,.65)}
+.res-score span{display:block;font:600 13px var(--mono);letter-spacing:.2em;color:var(--mut);margin-top:8px}
+.res-verdict{display:inline-block;margin-top:16px;font:700 13px var(--disp);letter-spacing:.2em;padding:9px 18px;border-radius:999px;border:1px solid}
+.res-pct{font:600 13px var(--mono);color:var(--mut);margin-top:12px}
+.res-reason{margin-top:10px;font:600 12px var(--mono);color:var(--red)}
+.res-reason:empty{display:none}
+.m-row{display:flex;justify-content:space-between;gap:14px;padding:9px 2px;border-bottom:1px dashed #1c2848;font-size:13.5px}
+.m-row:last-child{border-bottom:0}
+.m-row span{color:var(--mut)}
+.m-row b{text-align:right;font-weight:600}
+footer.credit{text-align:center;font:500 11px var(--mono);color:#3d4b7c;margin-top:26px;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="glow glow-a" aria-hidden="true"></div>
+<div class="glow glow-b" aria-hidden="true"></div>
+
+<main class="wrap">
+
+<!-- ЭКРАН 1 · СТАРТ -->
+<section class="screen on" id="scrStart">
+  <div class="kicker">Колледж · 1 курс · Физика</div>
+  <h1 class="ttl">Жидкости.<br>Газы. <span class="acc">Центр масс.</span></h1>
+  <div class="topics">
+    <span class="chip c1">Центр масс</span>
+    <span class="chip c2">Закон Паскаля</span>
+    <span class="chip c3">Опыт Торричелли</span>
+    <span class="chip c4">Атмосферное давление</span>
+  </div>
+  <div class="card">
+    <div class="teacher">
+      <div class="t-ava">⚛</div>
+      <div><div class="t-lbl">Учитель физики</div><div class="t-name">Кунгозин Даулет Багдашұлы</div></div>
+    </div>
+    <div class="field"><label>Фамилия и имя учащегося</label>
+      <input id="inName" type="text" maxlength="60" autocomplete="off" placeholder="Введите ФИ">
+    </div>
+    <div class="row2">
+      <div class="field"><label>Группа</label>
+        <select id="selGroup"><option value="" disabled selected>Выберите…</option><option>Т-116</option><option>ПМЛ-116</option></select>
+      </div>
+      <div class="field"><label>Вариант</label>
+        <select id="selVar"><option value="1" selected>Вариант 1</option><option value="2">Вариант 2</option></select>
+      </div>
+    </div>
+    <div class="att-line" id="attLine"></div>
+    <button class="btn btn-main" id="btnToRules" disabled>Продолжить →</button>
+  </div>
+  <div class="formula-foot">
+    <span>p = F / S</span><span>p = ρ·g·h</span><span>F₂/F₁ = S₂/S₁</span><span>x_ц = (m₁x₁ + m₂x₂)/(m₁ + m₂)</span>
+  </div>
+</section>
+
+<!-- ЭКРАН 2 · ДИСКЛЕЙМЕР -->
+<section class="screen" id="scrRules">
+  <div class="kicker">Перед стартом</div>
+  <h2 class="ttl2">Правила и академическая честность</h2>
+  <div class="card">
+    <ol class="r-list">
+      <li><b>15 вопросов</b>: 10 тестовых и 5 расчётных задач. Максимум — <b>15 баллов</b> (по 1 баллу за вопрос).</li>
+      <li>На каждый вопрос — <b>1 минута 30 секунд</b>. Если время вышло, тест автоматически перейдёт к следующему вопросу.</li>
+      <li>Вернуться к предыдущему вопросу <b>нельзя</b>.</li>
+      <li>В расчётной задаче выберите формулу из списка и введите ответ <b>числом без единиц измерения</b> (дробь — через запятую).</li>
+      <li><b>Античит:</b> не сворачивайте тест и не открывайте другие окна/приложения поверх него. Первое нарушение — предупреждение, второе — тест завершается автоматически. Открытие клавиатуры для ввода ответа нарушением не считается.</li>
+      <li>Каждое прохождение (включая автозавершение античитом) засчитывается как <b>попытка</b> и попадает в журнал.</li>
+      <li>Разбор правильных и неправильных ответов после теста <b>не показывается</b>.</li>
+    </ol>
+    <div class="ac-note">⚠ Во время теста запрещено использовать калькулятор, конспекты и посторонние приложения. Выполняйте работу самостоятельно — это принцип академической честности.</div>
+    <label class="agree"><input type="checkbox" id="chkAgree"><span>Я прочитал(а) правила и обязуюсь выполнить тест самостоятельно</span></label>
+    <button class="btn btn-main" id="btnStart" disabled>Начать тест</button>
+  </div>
+</section>
+
+<!-- ЭКРАН 3 · ТЕСТ -->
+<section class="screen" id="scrQuiz">
+  <header class="q-top">
+    <div class="q-who"><span class="chip who" id="chipName">—</span><span class="chip alt" id="chipMeta">—</span></div>
+    <div class="timer" id="timerBox">
+      <svg viewBox="0 0 60 60"><circle class="t-bg" cx="30" cy="30" r="26"/><circle class="t-fg" id="tFg" cx="30" cy="30" r="26"/></svg>
+      <b id="tSec">90</b>
+    </div>
+  </header>
+  <div class="q-progress">
+    <div class="segs" id="segs"></div>
+    <div class="q-count">Вопрос <b id="qNum">1</b> / 15</div>
+  </div>
+  <article class="card q-card" id="qCard">
+    <div class="q-badge" id="qBadge"></div>
+    <h3 class="q-text" id="qText"></h3>
+    <div class="svgbox" id="qMedia"></div>
+    <div id="qBody"></div>
+  </article>
+  <footer class="q-foot"><button class="btn btn-next" id="btnNext" disabled>Далее</button></footer>
+</section>
+
+<!-- ЭКРАН 4 · РЕЗУЛЬТАТЫ (БЕЗ РАЗБОРА ОТВЕТОВ) -->
+<section class="screen" id="scrRes">
+  <div class="kicker">Тест завершён</div>
+  <h2 class="ttl2">Результат</h2>
+  <div class="card res-hero">
+    <div class="res-score"><b id="rScore">0</b><span>ИЗ 15 БАЛЛОВ</span></div>
+    <div class="res-verdict" id="rVerdict">—</div>
+    <div class="res-pct" id="rPct"></div>
+    <div class="res-reason" id="rReason"></div>
+  </div>
+  <div class="card" id="rMeta"></div>
+  <button class="btn btn-main" id="btnAgain">Пройти ещё раз</button>
+  <footer class="credit">Учитель физики · Кунгозин Даулет Багдашұлы</footer>
+</section>
+</main>
+
+<!-- МОДАЛКА АНТИЧИТА -->
+<div class="ac-modal" id="acModal" aria-hidden="true">
+  <div class="ac-box">
+    <div class="ac-ico">⚠️</div>
+    <h3>Нарушение правил!</h3>
+    <p id="acText">Обнаружено сворачивание теста или другое окно поверх него.</p>
+    <p class="ac-sub">Это первое предупреждение. При следующем нарушении тест будет завершён автоматически, попытка будет засчитана.</p>
+    <button class="btn btn-warn" id="btnAc">Понятно, продолжить</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ══════════════════════ НАСТРОЙКИ ══════════════════════ */
+// ⬇ Вставьте сюда URL веб-приложения Apps Script (см. Code.gs)
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzF2l3I_CPhd_7LNMACEkv9mPhx6qwDNqH7AAn0sZcjDXXQksEjKIB1XIqLArdeyjpIkQ/exec";
+const QTIME = 90;               // секунд на вопрос
+const LETTERS = ["А","Б","В","Г"];
+
+/* ══════════════════════ SVG-СХЕМЫ И ГРАФИКИ ══════════════════════ */
+const PAT = (a,b)=>`<pattern id="gr${a}" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#3a4a7a" stroke-opacity=".35"/><path d="M${b} 0H0V${b}" fill="none" stroke="#3a4a7a" stroke-opacity=".35"/></pattern><pattern id="gr${a}m" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M100 0H0V100" fill="none" stroke="#4c60a5" stroke-opacity=".45"/></pattern>`;
+const TXT = 'font-family="JetBrains Mono,monospace" fill="#a8b7e8"';
+const AX  = 'stroke="#93a7e6" stroke-width="1.5"';
+
+const SVG_CM = `
+<svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Два шара на стержне, ось x">
+<defs>${PAT('a')}<marker id="arA" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker></defs>
+<rect width="560" height="250" fill="#0a0f1e"/><rect width="560" height="250" fill="url(#gra)"/><rect width="560" height="250" fill="url(#gram)"/>
+<line x1="36" y1="176" x2="540" y2="176" ${AX} marker-end="url(#arA)"/>
+${[0,1,2,3,4,5,6].map(k=>`<line x1="${60+70*k}" y1="170" x2="${60+70*k}" y2="182" ${AX}/><text x="${60+70*k}" y="202" font-size="12" text-anchor="middle" ${TXT}>${k}</text>`).join('')}
+<text x="532" y="160" font-size="14" font-weight="600" text-anchor="end" fill="#dfe6ff">x, м</text>
+<line x1="60" y1="150" x2="340" y2="142" stroke="#8fa3d9" stroke-width="5" stroke-linecap="round"/>
+<circle cx="60" cy="150" r="24" fill="#00e5ff" opacity=".15"/><circle cx="60" cy="150" r="15" fill="#00c4e0" stroke="#b9f4ff" stroke-width="2"/>
+<circle cx="340" cy="142" r="38" fill="#ff2fd6" opacity=".12"/><circle cx="340" cy="142" r="26" fill="#d122ad" stroke="#ffb8ee" stroke-width="2"/>
+<text x="60" y="112" font-size="14" text-anchor="middle" fill="#9ff3ff" font-family="JetBrains Mono,monospace">m₁ = 1 кг</text>
+<text x="340" y="88" font-size="14" text-anchor="middle" fill="#ffc4f2" font-family="JetBrains Mono,monospace">m₂ = 3 кг</text>
+</svg>`;
+
+const SVG_PRESS = `
+<svg viewBox="0 0 560 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Гидравлический пресс">
+<defs>${PAT('b')}
+<marker id="arB" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker>
+<marker id="arBa" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#ffb020"/></marker>
+<marker id="arBg" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#39ff88"/></marker></defs>
+<rect width="560" height="330" fill="#0a0f1e"/><rect width="560" height="330" fill="url(#grb)"/><rect width="560" height="330" fill="url(#grbm)"/>
+<line x1="44" y1="282" x2="44" y2="52" ${AX} marker-end="url(#arB)"/>
+<text x="44" y="40" font-size="13" text-anchor="middle" fill="#dfe6ff" font-family="JetBrains Mono,monospace">h, см</text>
+${[[280,0],[225,5],[170,10],[115,15],[60,20]].map(([y,v])=>`<line x1="38" y1="${y}" x2="50" y2="${y}" ${AX}/><text x="34" y="${y+4}" font-size="10" text-anchor="end" ${TXT}>${v}</text>`).join('')}
+<path d="M98 150 H172 V242 H328 V170 H472 V278 H98 Z" fill="rgba(0,190,255,.2)" stroke="rgba(0,229,255,.5)" stroke-width="1.5"/>
+<path d="M96 96 V280 H474 V64" fill="none" stroke="#a7b6ea" stroke-width="3"/>
+<line x1="174" y1="96" x2="174" y2="242" stroke="#a7b6ea" stroke-width="3"/>
+<line x1="326" y1="64" x2="326" y2="242" stroke="#a7b6ea" stroke-width="3"/>
+<rect x="130" y="64" width="10" height="76" fill="#5a6aa0"/>
+<rect x="98" y="138" width="74" height="14" rx="3" fill="#5a6aa0" stroke="#cdd7ff" stroke-width="1.5"/>
+<line x1="135" y1="16" x2="135" y2="54" stroke="#ffb020" stroke-width="3.5" marker-end="url(#arBa)"/>
+<text x="148" y="34" font-size="16" font-weight="700" fill="#ffd27a" font-family="JetBrains Mono,monospace">F₁</text>
+<rect x="352" y="96" width="96" height="60" rx="6" fill="rgba(255,47,214,.16)" stroke="#ff7ae0" stroke-width="2"/>
+<text x="400" y="131" font-size="13" text-anchor="middle" fill="#ffc4f2" font-family="JetBrains Mono,monospace">груз</text>
+<rect x="328" y="156" width="144" height="16" rx="3" fill="#5a6aa0" stroke="#cdd7ff" stroke-width="1.5"/>
+<line x1="500" y1="212" x2="500" y2="118" stroke="#39ff88" stroke-width="3.5" marker-end="url(#arBg)"/>
+<text x="512" y="160" font-size="16" font-weight="700" fill="#9dffc4" font-family="JetBrains Mono,monospace">F₂</text>
+<text x="90" y="132" font-size="15" text-anchor="end" fill="#9ff3ff" font-family="JetBrains Mono,monospace">S₁</text>
+<text x="506" y="240" font-size="15" fill="#9ff3ff" font-family="JetBrains Mono,monospace">S₂</text>
+</svg>`;
+
+const SVG_GRAPH_PH = `
+<svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="График p от h">
+<defs>${PAT('c')}<marker id="arC" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker></defs>
+<rect width="560" height="340" fill="#0a0f1e"/><rect width="560" height="340" fill="url(#grc)"/><rect width="560" height="340" fill="url(#grcm)"/>
+<line x1="80" y1="284" x2="536" y2="284" ${AX} marker-end="url(#arC)"/>
+<line x1="80" y1="284" x2="80" y2="30" ${AX} marker-end="url(#arC)"/>
+${[0,1,2,3,4,5].map(k=>`<line x1="${80+80*k}" y1="284" x2="${80+80*k}" y2="290" ${AX}/><text x="${80+80*k}" y="308" font-size="12" text-anchor="middle" ${TXT}>${k}</text>`).join('')}
+${[0,10,20,30,40,50].map((v,i)=>`<line x1="74" y1="${284-50*i}" x2="80" y2="${284-50*i}" ${AX}/><text x="68" y="${288-50*i}" font-size="11" text-anchor="end" ${TXT}>${v}</text>`).join('')}
+<text x="524" y="308" font-size="14" font-weight="600" text-anchor="end" fill="#dfe6ff">h, м</text>
+<text x="94" y="26" font-size="14" font-weight="600" fill="#dfe6ff">p, кПа</text>
+<line x1="80" y1="284" x2="480" y2="34" stroke="#00e5ff" stroke-width="8" opacity=".18"/>
+<line x1="80" y1="284" x2="480" y2="34" stroke="#00e5ff" stroke-width="3"/>
+${[1,2,3,4,5].map(k=>`<circle cx="${80+80*k}" cy="${284-50*k}" r="4.5" fill="#0a0f1e" stroke="#00e5ff" stroke-width="2"/>`).join('')}
+</svg>`;
+
+const SVG_GRAPH_ALT = `
+<svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="График атмосферного давления от высоты">
+<defs>${PAT('d')}<marker id="arD" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker></defs>
+<rect width="560" height="340" fill="#0a0f1e"/><rect width="560" height="340" fill="url(#grd)"/><rect width="560" height="340" fill="url(#grdm)"/>
+<line x1="80" y1="284" x2="536" y2="284" ${AX} marker-end="url(#arD)"/>
+<line x1="80" y1="284" x2="80" y2="30" ${AX} marker-end="url(#arD)"/>
+${[0,1000,2000,3000,4000,5000].map((v,i)=>`<line x1="${80+80*i}" y1="284" x2="${80+80*i}" y2="290" ${AX}/><text x="${80+80*i}" y="308" font-size="10" text-anchor="middle" ${TXT}>${v}</text>`).join('')}
+${[0,20,40,60,80,100].map((v,i)=>`<line x1="74" y1="${284-50*i}" x2="80" y2="${284-50*i}" ${AX}/><text x="68" y="${288-50*i}" font-size="11" text-anchor="end" ${TXT}>${v}</text>`).join('')}
+<text x="524" y="308" font-size="14" font-weight="600" text-anchor="end" fill="#dfe6ff">h, м</text>
+<text x="94" y="26" font-size="14" font-weight="600" fill="#dfe6ff">p, кПа</text>
+<path d="M80 34 C108 52 132 60 160 66 C188 72 212 85 240 93 C268 101 292 110 320 117 C348 124 372 131 400 136 C428 141 454 147 480 150" fill="none" stroke="#ff2fd6" stroke-width="8" opacity=".16"/>
+<path d="M80 34 C108 52 132 60 160 66 C188 72 212 85 240 93 C268 101 292 110 320 117 C348 124 372 131 400 136 C428 141 454 147 480 150" fill="none" stroke="#ff2fd6" stroke-width="3"/>
+${[[80,34],[160,66],[240,93],[320,117],[400,136],[480,150]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.5" fill="#0a0f1e" stroke="#ff2fd6" stroke-width="2"/>`).join('')}
+</svg>`;
+
+const SVG_LIFT = `
+<svg viewBox="0 0 560 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Гидравлический лифт">
+<defs>${PAT('e')}
+<marker id="arE" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker>
+<marker id="arEa" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#ffb020"/></marker>
+<marker id="arEg" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#39ff88"/></marker></defs>
+<rect width="560" height="330" fill="#0a0f1e"/><rect width="560" height="330" fill="url(#gre)"/><rect width="560" height="330" fill="url(#grem)"/>
+<line x1="44" y1="282" x2="44" y2="58" ${AX} marker-end="url(#arE)"/>
+<text x="44" y="46" font-size="13" text-anchor="middle" fill="#dfe6ff" font-family="JetBrains Mono,monospace">h, см</text>
+${[[280,0],[225,5],[170,10],[115,15],[60,20]].map(([y,v])=>`<line x1="38" y1="${y}" x2="50" y2="${y}" ${AX}/><text x="34" y="${y+4}" font-size="10" text-anchor="end" ${TXT}>${v}</text>`).join('')}
+<path d="M98 202 H172 V242 H322 V126 H478 V278 H98 Z" fill="rgba(0,190,255,.2)" stroke="rgba(0,229,255,.5)" stroke-width="1.5"/>
+<path d="M96 150 V280 H480 V120" fill="none" stroke="#a7b6ea" stroke-width="3"/>
+<line x1="174" y1="150" x2="174" y2="242" stroke="#a7b6ea" stroke-width="3"/>
+<line x1="320" y1="120" x2="320" y2="242" stroke="#a7b6ea" stroke-width="3"/>
+<rect x="131" y="70" width="10" height="122" fill="#5a6aa0"/>
+<rect x="98" y="190" width="76" height="14" rx="3" fill="#5a6aa0" stroke="#cdd7ff" stroke-width="1.5"/>
+<line x1="136" y1="18" x2="136" y2="58" stroke="#ffb020" stroke-width="3.5" marker-end="url(#arEa)"/>
+<text x="149" y="36" font-size="16" font-weight="700" fill="#ffd27a" font-family="JetBrains Mono,monospace">F₁</text>
+<rect x="312" y="108" width="176" height="16" rx="4" fill="#5a6aa0" stroke="#cdd7ff" stroke-width="1.5"/>
+<rect x="336" y="71" width="128" height="27" rx="10" fill="rgba(0,229,255,.16)" stroke="#00e5ff" stroke-width="2"/>
+<path d="M362 71 L374 51 H426 L440 71 Z" fill="rgba(0,229,255,.16)" stroke="#00e5ff" stroke-width="2"/>
+<circle cx="360" cy="97" r="11" fill="#0a0f1e" stroke="#9ff3ff" stroke-width="2.5"/>
+<circle cx="440" cy="97" r="11" fill="#0a0f1e" stroke="#9ff3ff" stroke-width="2.5"/>
+<line x1="504" y1="212" x2="504" y2="118" stroke="#39ff88" stroke-width="3.5" marker-end="url(#arEg)"/>
+<text x="516" y="160" font-size="16" font-weight="700" fill="#9dffc4" font-family="JetBrains Mono,monospace">F₂</text>
+<text x="90" y="186" font-size="15" text-anchor="end" fill="#9ff3ff" font-family="JetBrains Mono,monospace">S₁</text>
+<text x="508" y="240" font-size="15" fill="#9ff3ff" font-family="JetBrains Mono,monospace">S₂</text>
+</svg>`;
+
+const SVG_TORR = `
+<svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Опыт Торричелли">
+<defs>${PAT('f')}
+<linearGradient id="mercG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5daea"/><stop offset="1" stop-color="#8d94b2"/></linearGradient>
+<marker id="arF" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#93a7e6"/></marker>
+<marker id="arFc" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0 0L9 3L0 6Z" fill="#00e5ff"/></marker></defs>
+<rect width="560" height="340" fill="#0a0f1e"/><rect width="560" height="340" fill="url(#grf)"/><rect width="560" height="340" fill="url(#grfm)"/>
+<path d="M110 236 H490 L458 302 H142 Z" fill="url(#mercG)" stroke="#cdd7ff" stroke-width="2"/>
+<line x1="118" y1="238" x2="482" y2="238" stroke="#eef1ff" stroke-width="1.5" opacity=".55"/>
+<rect x="257" y="112" width="30" height="156" fill="url(#mercG)"/>
+<path d="M254 268 V54 Q254 44 264 44 H280 Q290 44 290 54 V268" fill="none" stroke="#cdd7ff" stroke-width="3"/>
+<line x1="290" y1="112" x2="336" y2="112" stroke="#7f8fc7" stroke-width="1.5" stroke-dasharray="4 4"/>
+<line x1="336" y1="238" x2="336" y2="100" ${AX} marker-end="url(#arF)"/>
+<line x1="330" y1="238" x2="342" y2="238" ${AX}/><text x="346" y="242" font-size="11" ${TXT}>0</text>
+<line x1="330" y1="173" x2="342" y2="173" ${AX}/><text x="346" y="177" font-size="11" ${TXT}>380</text>
+<line x1="330" y1="112" x2="342" y2="112" ${AX}/><text x="346" y="116" font-size="11" ${TXT}>760</text>
+<text x="346" y="94" font-size="13" font-weight="600" fill="#dfe6ff" font-family="JetBrains Mono,monospace">h, мм</text>
+<line x1="292" y1="78" x2="300" y2="74" stroke="#7f8fc7" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="304" y="76" font-size="12" fill="#93a7e6" font-family="JetBrains Mono,monospace">вакуум</text>
+<line x1="170" y1="196" x2="170" y2="226" stroke="#00e5ff" stroke-width="3" marker-end="url(#arFc)"/>
+<text x="170" y="186" font-size="12" text-anchor="middle" fill="#9ff3ff" font-family="JetBrains Mono,monospace">p_атм</text>
+<line x1="430" y1="196" x2="430" y2="226" stroke="#00e5ff" stroke-width="3" marker-end="url(#arFc)"/>
+<text x="430" y="186" font-size="12" text-anchor="middle" fill="#9ff3ff" font-family="JetBrains Mono,monospace">p_атм</text>
+<text x="200" y="278" font-size="13" fill="#2b3350" font-weight="700" font-family="JetBrains Mono,monospace">ртуть</text>
+</svg>`;
+
+/* ══════════════════════ БАНК ВОПРОСОВ ══════════════════════ */
+const V1 = [
+ {type:"theory",text:"Что такое центр масс тела?",options:["Точка приложения силы трения","Точка, которая движется так, будто вся масса тела сосредоточена в ней","Всегда самая высокая точка тела","Точка, которой тело опирается на поверхность"],correct:1},
+ {type:"theory",text:"Согласно закону Паскаля давление, оказываемое на жидкость или газ, …",options:["передаётся только вниз","передаётся только в направлении действия силы","передаётся без изменения во все точки и по всем направлениям","передаётся только вверх"],correct:2},
+ {type:"theory",text:"Опыт Торричелли позволяет измерить …",options:["плотность воздуха","атмосферное давление","скорость течения жидкости","силу Архимеда"],correct:1},
+ {type:"theory",text:"Атмосферное давление на вершине горы по сравнению с подножием …",options:["такое же","больше","меньше","не зависит от высоты"],correct:2},
+ {type:"scheme",text:"На рисунке два шара закреплены на невесомом стержне. В какой точке находится центр масс системы?",svg:SVG_CM,options:["x = 1 м","x = 2 м","x = 3 м","x = 4 м"],correct:2},
+ {type:"scheme",text:"Какой закон лежит в основе работы гидравлического пресса, изображённого на схеме?",svg:SVG_PRESS,options:["Закон Архимеда","Закон Паскаля","Третий закон Ньютона","Закон Гука"],correct:1},
+ {type:"scheme",text:"На графике показана зависимость давления в жидкости p от глубины h. Как давление зависит от глубины?",svg:SVG_GRAPH_PH,options:["Убывает линейно","Не изменяется","Растёт линейно","Растёт квадратично"],correct:2},
+ {type:"formula",text:"По какой формуле вычисляется давление?",options:["p = F · S","p = F / S","p = S / F","p = m · g · S"],correct:1},
+ {type:"formula",text:"По какой формуле вычисляется гидростатическое давление жидкости?",options:["p = ρ · g · h","p = ρ · g / h","p = m · g / h","p = ρ / (g · h)"],correct:0},
+ {type:"formula",text:"По какой формуле находится координата центра масс двух тел?",options:["x_ц = (m₁ + m₂) / (x₁ + x₂)","x_ц = m₁x₁ − m₂x₂","x_ц = (m₁x₁ + m₂x₂) / (m₁ + m₂)","x_ц = (x₁ + x₂) / m₁"],correct:2},
+ {type:"calc",text:"Сила 900 Н действует перпендикулярно поверхности площадью 3 м². Найдите давление. Ответ в Па.",formulas:["p = F · S","p = F / S","p = S / F","F = p · S"],fCorrect:1,answer:300},
+ {type:"calc",text:"Найдите давление воды на глубине 5 м. ρ = 1000 кг/м³, g = 10 Н/кг. Ответ в Па.",formulas:["h = p / (ρ · g)","p = ρ · g / h","p = ρ · g · h","F = p · S"],fCorrect:2,answer:50000},
+ {type:"calc",text:"Площадь малого поршня гидравлического пресса 0,01 м², большого — 0,5 м². На малый поршень действует сила 100 Н. Какую силу даёт большой поршень? Ответ в Н.",formulas:["F₂ = F₁ · S₁ / S₂","F₂ = F₁ · S₂ / S₁","F₂ = F₁ / (S₁ · S₂)","F₂ = F₁ + S₁ · S₂"],fCorrect:1,answer:5000},
+ {type:"calc",text:"Давление 20000 Па действует на поршень площадью 0,4 м². Найдите силу, действующую на поршень. Ответ в Н.",formulas:["F = p · S","F = p / S","F = S / p","F = ρ · g · h"],fCorrect:0,answer:8000},
+ {type:"calc",text:"Шар массой 1 кг находится в точке x₁ = 0 м, шар массой 3 кг — в точке x₂ = 4 м. Найдите координату центра масс. Ответ в м.",formulas:["x_ц = (m₁ + m₂) / (x₁ + x₂)","x_ц = (x₁ + x₂) / 2","x_ц = m₁x₁ − m₂x₂","x_ц = (m₁x₁ + m₂x₂) / (m₁ + m₂)"],fCorrect:3,answer:3}
+];
+
+const V2 = [
+ {type:"theory",text:"Где находится центр масс однородного тела правильной формы?",options:["Всегда смещён к краю","Всегда вне тела","В центре симметрии (геометрическом центре)","В верхней точке тела"],correct:2},
+ {type:"theory",text:"Какое устройство работает на основе закона Паскаля?",options:["Гидравлический пресс","Пружинный динамометр","Рычаг","Неподвижный блок"],correct:0},
+ {type:"theory",text:"Какая жидкость используется в опыте Торричелли?",options:["Вода","Спирт","Ртуть","Масло"],correct:2},
+ {type:"theory",text:"Каким прибором измеряют атмосферное давление?",options:["Термометром","Барометром-анероидом","Динамометром","Спидометром"],correct:1},
+ {type:"scheme",text:"На графике показана зависимость атмосферного давления p от высоты подъёма h. Что происходит с давлением при подъёме?",svg:SVG_GRAPH_ALT,options:["Увеличивается","Уменьшается","Остаётся постоянным","Не зависит от высоты"],correct:1},
+ {type:"scheme",text:"Гидравлический лифт. Как соотносятся давления, создаваемые жидкостью под малым и большим поршнями (по закону Паскаля)?",svg:SVG_LIFT,options:["Под большим поршнем больше","Под большим поршнем меньше","Одинаковы","Равны нулю"],correct:2},
+ {type:"scheme",text:"Опыт Торричелли. Что произойдёт с высотой h столба ртути в трубке, если атмосферное давление уменьшится?",svg:SVG_TORR,options:["Увеличится","Уменьшится","Не изменится","Станет равной нулю"],correct:1},
+ {type:"formula",text:"По какой формуле вычисляется сила давления?",options:["F = p / S","F = S / p","F = p · g / S","F = p · S"],correct:3},
+ {type:"formula",text:"По какой формуле находится высота столба жидкости, уравновешивающая давление?",options:["h = p · ρ · g","h = p / (ρ · g)","h = ρ · g / p","h = p − ρ · g"],correct:1},
+ {type:"formula",text:"Как относится выигрыш в силе гидравлической машины к площадям поршней?",options:["F₂ / F₁ = S₂ / S₁","F₂ / F₁ = S₁ / S₂","F₂ / F₁ = S₁ · S₂","F₂ / F₁ = S₂² / S₁²"],correct:0},
+ {type:"calc",text:"Сила 800 Н действует перпендикулярно поверхности площадью 4 м². Найдите давление. Ответ в Па.",formulas:["p = S / F","p = F · S","p = F / S","p = F − S"],fCorrect:2,answer:200},
+ {type:"calc",text:"Найдите давление воды на глубине 3 м. ρ = 1000 кг/м³, g = 10 Н/кг. Ответ в Па.",formulas:["p = ρ · g · h","p = ρ / (g · h)","p = h / (ρ · g)","p = ρ · g + h"],fCorrect:0,answer:30000},
+ {type:"calc",text:"Площадь малого поршня 0,02 м², большого — 0,4 м². На малый поршень действует сила 200 Н. Какую силу даёт большой поршень? Ответ в Н.",formulas:["F₂ = F₁ · S₁ / S₂","F₂ = F₁ + S₂ / S₁","F₂ = F₁ · S₂ / S₁","F₂ = F₁ · S₁ · S₂"],fCorrect:2,answer:4000},
+ {type:"calc",text:"Давление 50000 Па действует на поршень площадью 0,2 м². Найдите силу. Ответ в Н.",formulas:["F = p / S","F = S / p","F = ρ · g · h","F = p · S"],fCorrect:3,answer:10000},
+ {type:"calc",text:"Шар массой 3 кг находится в точке x₁ = 0 м, шар массой 2 кг — в точке x₂ = 5 м. Найдите координату центра масс. Ответ в м.",formulas:["x_ц = (m₁x₁ + m₂x₂) / (m₁ + m₂)","x_ц = (m₁ + m₂) / (x₁ + x₂)","x_ц = m₁x₂ − m₂x₁","x_ц = (x₁ · x₂) / 2"],fCorrect:0,answer:2}
+];
+
+const TYPE_META = {
+  theory:["Теория","b-cyan"], scheme:["Схема · рисунок","b-mag"],
+  formula:["Формула","b-green"], calc:["Расчётная задача","b-amber"]
+};
+
+/* ══════════════════════ СОСТОЯНИЕ И УТИЛИТЫ ══════════════════════ */
+const $  = s=>document.querySelector(s);
+const $$ = s=>[...document.querySelectorAll(s)];
+const state = {name:"",group:"",variant:"1",items:[],index:0,user:[],t0:0,active:false,finished:false};
+let tLeft = QTIME, tInt = null, warnCount = 0, suppressAC = 0, advancing = false, baseVH = innerHeight;
+
+const show = id=>{ $$(".screen").forEach(s=>s.classList.remove("on")); $("#"+id).classList.add("on"); scrollTo({top:0}); };
+const fmt  = ms=>{ const s=Math.round(ms/1000); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
+const storeKey = ()=>`ptest:${(state.name||"").trim().toLowerCase().replace(/\s+/g," ")}|${state.group}`;
+
+function getDevice(){
+  const ua = navigator.userAgent;
+  let os = "Неизвестно";
+  if(/iPhone|iPod/i.test(ua)) os="iOS (iPhone)"; else if(/iPad/i.test(ua)) os="iPadOS";
+  else if(/Android/i.test(ua)) os="Android"; else if(/Mac OS X/i.test(ua)) os="macOS";
+  else if(/Windows/i.test(ua)) os="Windows"; else if(/Linux/i.test(ua)) os="Linux";
+  let br = "—";
+  if(/Edg\//.test(ua)) br="Edge"; else if(/YaBrowser/.test(ua)) br="Яндекс";
+  else if(/OPR\//.test(ua)) br="Opera"; else if(/Firefox\//.test(ua)) br="Firefox";
+  else if(/Chrome\//.test(ua)) br="Chrome"; else if(/Safari\//.test(ua)) br="Safari";
+  return (/Mobi|Android|iPhone|iPad/i.test(ua)?"Смартфон":"Компьютер")+" · "+os+" · "+br;
+}
+function getAttempts(){ return +(localStorage.getItem(storeKey()+":att")||0); }
+function incAttempts(){ const n=getAttempts()+1; localStorage.setItem(storeKey()+":att",n); return n; }
+
+/* ══════════════════════ СТАРТ ══════════════════════ */
+function refreshStart(){
+  const ok = $("#inName").value.trim().length>=3 && $("#selGroup").value;
+  $("#btnToRules").disabled = !ok;
+  if(ok){ const a=getAttempts(); $("#attLine").textContent = a>0?`Использовано попыток: ${a}`:""; }
+  else $("#attLine").textContent="";
+}
+$("#inName").addEventListener("input",refreshStart);
+$("#selGroup").addEventListener("change",refreshStart);
+$("#btnToRules").addEventListener("click",()=>show("scrRules"));
+$("#chkAgree").addEventListener("change",e=>{$("#btnStart").disabled=!e.target.checked;});
+$("#btnStart").addEventListener("click",startTest);
+$("#btnAgain").addEventListener("click",()=>{ refreshStart(); show("scrStart"); });
+
+function startTest(){
+  state.name = $("#inName").value.trim();
+  state.group = $("#selGroup").value;
+  state.variant = $("#selVar").value;
+  state.items = state.variant==="1"?V1:V2;
+  state.index=0; state.user=new Array(15).fill(null);
+  state.finished=false; state.active=true; state.t0=Date.now();
+  warnCount=0; advancing=false;
+  $("#chipName").textContent=state.name;
+  $("#chipMeta").textContent=`${state.group} · Вариант ${state.variant}`;
+  $("#segs").innerHTML = state.items.map(q=>`<i class="st-${q.type}"></i>`).join("");
+  show("scrQuiz");
+  renderQuestion();
+}
+
+/* ══════════════════════ ВОПРОСЫ ══════════════════════ */
+function renderQuestion(){
+  advancing=false;
+  const i=state.index, q=state.items[i];
+  stopTimer();
+  $("#qNum").textContent=i+1;
+  [...$("#segs").children].forEach((el,k)=>el.classList.toggle("done",k<i));
+  const [label,cls]=TYPE_META[q.type];
+  $("#qBadge").textContent=label; $("#qBadge").className="q-badge "+cls;
+  $("#qText").textContent=q.text;
+  $("#qMedia").innerHTML=q.svg||"";
+  const body=$("#qBody");
+  if(q.type==="calc"){
+    body.innerHTML =
+      `<label class="lbl">Шаг 1 · Выберите формулу</label>
+       <select id="fSel"><option value="" selected disabled>— выберите формулу —</option>
+       ${q.formulas.map((f,k)=>`<option value="${k}">${f}</option>`).join("")}</select>
+       <label class="lbl">Шаг 2 · Введите ответ <em>(число, без единиц измерения)</em></label>
+       <input id="numIn" class="num" type="text" inputmode="decimal" autocomplete="off" placeholder="например: 300">`;
+    $("#fSel").addEventListener("change",onCalcInput);
+    $("#numIn").addEventListener("input",onCalcInput);
+  } else {
+    body.innerHTML = `<div class="opts" id="optWrap">${q.options.map((o,k)=>
+      `<button class="opt" data-k="${k}"><i class="opt-key">${LETTERS[k]}</i><span>${o}</span></button>`).join("")}</div>`;
+    $("#optWrap").addEventListener("click",e=>{
+      const b=e.target.closest(".opt"); if(!b) return;
+      $$(".opt").forEach(x=>x.classList.remove("sel"));
+      b.classList.add("sel");
+      state.user[state.index]={kind:"opt",k:+b.dataset.k};
+      refreshNext();
+    });
+  }
+  state.user[i]=null;
+  refreshNext();
+  $("#btnNext").textContent = i===14 ? "Завершить тест" : "Далее";
+  const card=$("#qCard"); card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
+  startTimer();
+}
+function parseNum(s){ s=(s||"").replace(/\s+/g,"").replace(",","."); const v=parseFloat(s); return isNaN(v)?null:v; }
+function onCalcInput(){
+  const f=$("#fSel").value, nRaw=$("#numIn").value.trim(), n=parseNum(nRaw);
+  state.user[state.index] = (f!=="" && nRaw!=="") ? {kind:"calc",formula:+f,num:n,numRaw:nRaw} : null;
+  refreshNext();
+}
+function refreshNext(){ $("#btnNext").disabled = !state.user[state.index]; }
+$("#btnNext").addEventListener("click",()=>{ if(!state.user[state.index]||advancing) return; advance(); });
+function advance(){
+  if(advancing) return; advancing=true;
+  stopTimer();
+  state.index++;
+  if(state.index>=15) finishTest("Завершён учащимся");
+  else renderQuestion();
+}
+
+/* ══════════════════════ ТАЙМЕР ══════════════════════ */
+function startTimer(){
+  tLeft=QTIME; paintTimer();
+  tInt=setInterval(()=>{
+    tLeft--; paintTimer();
+    if(tLeft<=0){ stopTimer(); advance(); }
+  },1000);
+}
+function stopTimer(){ clearInterval(tInt); tInt=null; }
+function paintTimer(){
+  $("#tSec").textContent=tLeft;
+  $("#tFg").style.strokeDashoffset = (163.4*(1-tLeft/QTIME)).toFixed(1);
+  $("#timerBox").classList.toggle("warn",tLeft<=30&&tLeft>10);
+  $("#timerBox").classList.toggle("danger",tLeft<=10);
+}
+
+/* ══════════════════════ АНТИЧИТ ══════════════════════ */
+function keyboardLikelyOpen(){
+  const h = window.visualViewport ? window.visualViewport.height : innerHeight;
+  return h < baseVH*0.72;
+}
+function violation(reason){
+  if(!state.active || Date.now()<suppressAC) return;
+  warnCount++;
+  if(warnCount===1){ $("#acText").textContent=reason; $("#acModal").classList.add("on"); }
+  else finishTest("Античит: повторное нарушение");
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) violation("Обнаружено сворачивание теста или переключение вкладки.");
+});
+window.addEventListener("pagehide",()=>violation("Страница была закрыта или перезагружена."));
+window.addEventListener("blur",()=>{
+  setTimeout(()=>{
+    if(!state.active || document.hasFocus()) return;
+    const tag=document.activeElement?.tagName;
+    if(tag==="SELECT") return;
+    if(tag==="INPUT" && keyboardLikelyOpen()) return;
+    violation("Обнаружено другое окно поверх теста или потеря фокуса.");
+  },450);
+});
+window.addEventListener("resize",()=>{
+  const tag=document.activeElement?.tagName;
+  if(!/INPUT|SELECT|TEXTAREA/.test(tag||"")) baseVH = window.visualViewport?.height||innerHeight;
+});
+if(window.visualViewport) visualViewport.addEventListener("resize",()=>{
+  const tag=document.activeElement?.tagName;
+  if(!/INPUT|SELECT|TEXTAREA/.test(tag||"")) baseVH = visualViewport.height;
+});
+$("#btnAc").addEventListener("click",()=>{ $("#acModal").classList.remove("on"); suppressAC=Date.now()+1500; });
+window.addEventListener("beforeunload",e=>{ if(state.active){ e.preventDefault(); e.returnValue=""; } });
+document.addEventListener("contextmenu",e=>{ if(state.active) e.preventDefault(); });
+
+/* ══════════════════════ ЗАВЕРШЕНИЕ И РЕЗУЛЬТАТЫ ══════════════════════ */
+function finishTest(reason){
+  if(state.finished) return;
+  state.finished=true; state.active=false;
+  stopTimer(); $("#acModal").classList.remove("on");
+  const dur=Date.now()-state.t0, detail=[]; let score=0;
+  state.items.forEach((q,i)=>{
+    const u=state.user[i]; let ok=false,given="— (нет ответа)",right;
+    if(q.type==="calc"){
+      right=`${LETTERS[q.fCorrect]}) ${q.formulas[q.fCorrect]} → ${q.answer}`;
+      if(u&&u.kind==="calc"){
+        given=`${LETTERS[u.formula]}) ${q.formulas[u.formula]} → ${u.numRaw||"—"}`;
+        ok = u.formula===q.fCorrect && u.num!==null && Math.abs(u.num-q.answer)<1e-6;
+      }
+    } else {
+      right=`${LETTERS[q.correct]}) ${q.options[q.correct]}`;
+      if(u&&u.kind==="opt"){ given=`${LETTERS[u.k]}) ${q.options[u.k]}`; ok=u.k===q.correct; }
+    }
+    if(ok) score++;
+    detail.push({q,ok,given,right});
+  });
+  const attempt=incAttempts(), timeStr=fmt(dur);
+  renderResults(score,attempt,timeStr,reason);   // разбор ответов учащемуся НЕ показывается
+  sendToSheets(score,attempt,timeStr,reason,detail); // полные тексты ответов уходят в таблицу
+}
+function renderResults(score,attempt,timeStr,reason){
+  const pct=Math.round(score/15*100);
+  const [txt,col] = score>=13?["ОТЛИЧНО","var(--green)"] : score>=10?["ХОРОШО","var(--cyan)"]
+                    : score>=7?["ЗАЧЁТ","var(--amber)"] : ["НУЖНО ПОВТОРИТЬ","var(--red)"];
+  $("#rScore").textContent=score;
+  $("#rPct").textContent=`${pct}% правильных ответов`;
+  const v=$("#rVerdict"); v.textContent=txt; v.style.color=col; v.style.borderColor=col; v.style.textShadow=`0 0 14px ${col}`;
+  $("#rReason").textContent = reason.startsWith("Античит") ? "⚠ Тест остановлен системой античитинга" : "";
+  $("#rMeta").innerHTML=[
+    ["ФИ учащегося",state.name],["Группа",state.group],["Вариант","Вариант "+state.variant],
+    ["Попыток использовано",attempt],["Затраченное время",timeStr],
+    ["Устройство",getDevice()],["Дата прохождения",new Date().toLocaleString("ru-RU")],["Статус",reason]
+  ].map(([k,v])=>`<div class="m-row"><span>${k}</span><b>${v}</b></div>`).join("");
+  show("scrRes");
+}
+
+/* ══════════════════════ GOOGLE SHEETS ══════════════════════ */
+async function sendToSheets(score,attempt,timeStr,reason,detail){
+  // Ответы ученика и эталон — полными текстами по каждому вопросу
+  const answersUser    = detail.map((d,i)=>`№${i+1}: ${d.given}`).join(" | ");
+  const answersCorrect = detail.map((d,i)=>`№${i+1}: ${d.right}`).join(" | ");
+  const payload={
+    date:new Date().toLocaleString("ru-RU"), name:state.name, group:state.group,
+    variant:"Вариант "+state.variant, score, max:15, percent:Math.round(score/15*100),
+    attempt, reason, time:timeStr, device:getDevice(),
+    answersUser, answersCorrect
+  };
+  if(!SHEET_URL || SHEET_URL.includes("ВСТАВЬТЕ")){
+    console.info("SHEET_URL не задан. Результат сохранён локально:",payload);
+    localStorage.setItem(storeKey()+":last",JSON.stringify(payload)); return;
+  }
+  try{
+    await fetch(SHEET_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  }catch(err){
+    console.warn("Google Sheets недоступен:",err);
+    localStorage.setItem(storeKey()+":last",JSON.stringify(payload));
+  }
+}
+refreshStart();
+</script>
+</body>
+</html>
